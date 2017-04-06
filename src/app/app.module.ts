@@ -23,6 +23,8 @@ import {
   AnimatedCallComponent,
   NavToolbarComponent,
   ToptenComponent,
+  FooterComponent,
+  AchievementComponent
 } from './components';
 
 import {
@@ -44,11 +46,11 @@ import {
   MesTropheesComponent,
   OauthRedirectComponent,
   PokechonHomeComponent,
-  ProfileComponent
+  ProfileComponent,
+  TutorielComponent
 } from './views';
-import { FooterComponent } from './components/footer/footer.component';
-import { AchievementComponent } from './components/achievement/achievement.component';
-import { TutorielComponent } from './views/tutoriel/tutoriel.component';
+
+import { reducer } from './rx/reducers';
 
 export function xsrfStrategyFactory() {
   return new CookieXSRFStrategy('csrftoken', 'X-CSRFToken');
@@ -83,7 +85,7 @@ export function xsrfStrategyFactory() {
     HttpModule,
     MaterialModule.forRoot(),
     FlexLayoutModule.forRoot(),
-    StoreModule,
+    StoreModule.provideStore(reducer),
     SimpleNotificationsModule.forRoot(),
     AppRoutingModule,
     SharedModule

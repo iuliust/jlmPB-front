@@ -1,6 +1,6 @@
-import { BasicInformationApiData } from '../shared';
+import { BasicInformationApiData } from './';
 
-export interface WsCallNotification {
+export interface CallLocationDescription {
     caller: {
         gps: {
             lat: number;
@@ -23,7 +23,7 @@ export interface WsCallNotification {
     };
 }
 
-export interface CallNoteDescription {
+export interface WebSocketCallMessage {
     call: {
         caller: {
             lat: string;

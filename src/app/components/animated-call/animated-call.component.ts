@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
-import { WsCallNotification } from '../../core';
+import { CallLocationDescription } from '../../shared';
 
 @Component({
   selector: 'g[jlmAnimatedCall]',
@@ -79,11 +79,11 @@ export class AnimatedCallComponent implements OnInit {
   pathInstructions: string;
 
   @Input()
-  jlmAnimatedCall: WsCallNotification;
+  jlmAnimatedCall: CallLocationDescription;
 
   constructor() { }
 
-  getPathInstructions(desc: WsCallNotification, pathType: 'line' | 'curve') {
+  getPathInstructions(desc: CallLocationDescription, pathType: 'line' | 'curve') {
     const callerSvg = desc.caller.svg,
           calleeSvg = desc.callee.svg,
           delta = {
@@ -122,7 +122,9 @@ export class AnimatedCallComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pathInstructions = this.getPathInstructions(this.jlmAnimatedCall, 'curve');
+    const pathInstructions = this.getPathInstructions(this.jlmAnimatedCall, 'curve');
+    console.log(pathInstructions);
+    this.pathInstructions = pathInstructions;
   }
 
 }

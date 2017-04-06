@@ -1,16 +1,22 @@
 import { Component, OnInit, isDevMode } from '@angular/core';
 import { MdSnackBar, MdSnackBarConfig, MdSnackBarRef } from '@angular/material';
-import { NotificationsService } from 'angular2-notifications';
 import { Http, Response } from '@angular/http';
+import { NotificationsService } from 'angular2-notifications';
 import 'rxjs/add/operator/toPromise';
-import { CallNoteDescription } from './core';
+
+import { Store } from '@ngrx/store';
+
+import { RootState, reducer } from './rx/reducers';
+import { AddCallAction } from './rx/actions/call';
+
 import {
   SocketConnectionService,
   AuthenticationService,
   BasicService,
   BasicInformationApiData,
   Achievement,
-  AchievementNotification
+  AchievementNotification,
+  WebSocketCallMessage
 } from './shared';
 
 import {
@@ -42,35 +48,39 @@ export class AppComponent implements OnInit {
     private http: Http,
     public basic: BasicService,
     private snack: MdSnackBar,
-    private notificationService: NotificationsService
+    private notificationService: NotificationsService,
+    private rootStore: Store<RootState>
   ) {}
 
   ngOnInit() {
     this.auth.getProfile()
       .catch(err => console.error(err.json()));
-    this.scs.room.addEventListener('message', (event) =>
-      this.onNotif(event)
-    , false);
+    this.scs.room.addEventListener('message', (event) => this.onNotif(event) , false);
     this.basic.getBasicInfo()
       .then(infos => this.basic.infos = infos)
       .catch(err => console.trace(err));
   }
 
   onNotif(message: MessageEvent) {
-    const parsed = JSON.parse(message.data);
+    const parsed: any = JSON.parse(message.data);
     switch (parsed.type) {
       case 'call':
-        const notif = parsed.value as CallNoteDescription;
+        const notif: WebSocketCallMessage = parsed.value;
+        const callActionPayload = {
+          call: notif,
+          agentUsername: notif.call.caller.agentUsername
+        };
+        this.rootStore.dispatch(new AddCallAction(callActionPayload));
         this.basic.infos = notif.updatedData;
-        if (
-          this.auth.currentUser !== null
-          && this.auth.currentUser.agentUsername === notif.call.caller.agentUsername
-        ) {
-          this.auth.getExtendedInfo()
-            .then((info) => {
-              this.auth.currentUser.phi = info.phi;
-            });
-        }
+        // if (
+        //   this.auth.currentUser !== null
+        //   && this.auth.currentUser.agentUsername === notif.call.caller.agentUsername
+        // ) {
+        //   this.auth.getExtendedInfo()
+        //     .then((info) => {
+        //       this.auth.currentUser.phi = info.phi;
+        //     });
+        // }
       break;
       case 'achievement':
         const trophyMessage = parsed as AchievementNotification;
